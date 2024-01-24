@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Targimo Email Solutions</title>
+    <link href="brain2.png" rel="icon" />
+
+    <!-- Firebase scripts -->
+    <script defer src="/__/firebase/10.7.1/firebase-app-compat.js"></script>
+    <script defer src="/__/firebase/10.7.1/firebase-auth-compat.js"></script>
+    <script
+      defer
+      src="/__/firebase/10.7.1/firebase-database-compat.js"
+    ></script>
+    <script
+      defer
+      src="/__/firebase/10.7.1/firebase-firestore-compat.js"
+    ></script>
+    <script
+      defer
+      src="/__/firebase/10.7.1/firebase-functions-compat.js"
+    ></script>
+    <script
+      defer
+      src="/__/firebase/10.7.1/firebase-messaging-compat.js"
+    ></script>
+    <script defer src="/__/firebase/10.7.1/firebase-storage-compat.js"></script>
+    <script
+      defer
+      src="/__/firebase/10.7.1/firebase-analytics-compat.js"
+    ></script>
+    <script
+      defer
+      src="/__/firebase/10.7.1/firebase-remote-config-compat.js"
+    ></script>
+    <script
+      defer
+      src="/__/firebase/10.7.1/firebase-performance-compat.js"
+    ></script>
+
+    <!-- Material-UI core CSS -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      integrity="sha384-wa4DHJCA/xz9LuvsgsgpPz5J+1OUqcjh5aO2Icizq2rZL6XaFDSN/6a9dJ6usBqI"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@mui/material@5.3.10/dist/material.min.css"
+    />
+
+    <style>
+      body {
+        font-family: "Roboto", sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-color: #f0f0f0;
+      }
+
+      #message {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 16px;
+      }
+
+      #inputBox {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        font-size: 16px;
+        border: 1px solid #3498db;
+        border-radius: 4px;
+        box-sizing: border-box;
+        outline: none;
+      }
+
+      #output {
+        font-size: 18px;
+        margin-bottom: 10px;
+        color: #333;
+        font-weight: bold;
+      }
+
+      #loading {
+        display: none;
+        text-align: center;
+      }
+
+      .loader {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+        border-top: 4px solid #3498db;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      #load {
+        font-size: 14px;
+        margin-top: 20px;
+      }
+
+      button {
+        background-color: #3498db;
+        color: #fff;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+        outline: none;
+      }
+
+      button:hover {
+        background-color: #2187c5;
+      }
+    </style>
+  </head>
+  <body>
+    <img
+      src="brain2.png"
+      alt="Brain Image"
+      style="max-width: 100%; height: auto; max-height: 150px"
+    />
+    <div id="message">
+      <h2>Welcome to Targimo Email Solutions</h2>
+    </div>
+    <div>
+      <label for="inputBox">Enter your email content:</label>
+      <input type="text" id="inputBox" />
+      <button onclick="showOutput()">Submit</button>
+    </div>
+    <div>
+      <p id="output">Output:</p>
+      <div id="loading">
+        <!-- Material-UI CircularProgress component -->
+        <div
+          style="display: flex; align-items: center; justify-content: center"
+        >
+          <div class="loader"></div>
+        </div>
+      </div>
+    </div>
+    <p id="load">Firebase SDK Loading&hellip;</p>
+
+    <!-- Material-UI core JavaScript -->
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/react@17.0.2/umd/react.development.js"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/react-dom@17.0.2/umd/react-dom.development.js"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/@mui/system@5.3.10/dist/system.esm.js"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/@mui/material@5.3.10/dist/material.esm.js"
+    ></script>
+
+    <script>
+      function showOutput() {
+        var inputText = document.getElementById("inputBox").value;
+        var outputElement = document.getElementById("output");
+        var loadingElement = document.getElementById("loading");
+
+        // Show loading indicator
+        loadingElement.style.display = "block";
+
+        // Simulate processing delay (replace this with your actual processing logic)
+        setTimeout(function () {
+          // Example: Displaying the input as output
+          outputElement.innerHTML =
+            "Here is the NLP analysis for your email: " + inputText;
+
+          // Hide loading indicator once processing is done
+          loadingElement.style.display = "none";
+        }, 2000); // Simulating a 2-second processing delay, replace with actual processing time
+      }
+    </script>
+  </body>
+</html>
