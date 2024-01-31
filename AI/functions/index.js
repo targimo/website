@@ -10,35 +10,47 @@ const openai = new OpenAI({
   apiKey: credentials.apikey.key,
 });
 
+const cors = require("cors")({ origin: true });
+
 exports.processEmail = functions.https.onRequest(async (req, res) => {
-  const email = req.query.email;
+  // Expecting POST request with JSON payload
+  //if (req.method !== "POST" || !req.body || !req.body.email) {
+  //  return res.status(400).json({ error: "Invalid request." });
+  //}
 
-  if (!email) {
-    return res.status(400).json({ error: "email is missing." });
-  }
+  cors(req, res, async () => {
+    const email = req.query.email;
 
-  const prompt = `Analyze the following email content:\n\n"${email}"\n\nIdentify negative sentiments, urgency, and product-related discussions.`;
-
-  const params = {
-    messages: [{ role: "user", content: prompt }],
-    model: "gpt-3.5-turbo",
-  };
-
-  try {
-    const process = await openai.chat.completions.create(params);
-
-    if (!process) {
-      return res.status(500).json({ error: "processing completion failed." });
+    if (!email) {
+      return res.status(400).json({ error: "email is missing." });
     }
 
-    await firestore.collection("processedEmails").add(process);
+    const prompt = `Analyze the following email content:\n\n"${email}"\n\nIdentify negative sentiments, urgency, and product-related discussions.`;
 
-    res.status(200).json({ message: "processing successful", data: process });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Internal Server Error", detail: error.message });
-  }
+    const params = {
+      messages: [{ role: "user", content: prompt }],
+      model: "gpt-3.5-turbo",
+    };
+
+    try {
+      const process = await openai.chat.completions.create(params);
+
+      if (!process) {
+        return res.status(500).json({ error: "processing completion failed." });
+      }
+
+      await firestore.collection("processedEmails").add(process);
+
+      res.status(200).json({ message: "processing successful", data: process });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ error: "Internal Server Error", detail: error.message });
+    }
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "GET, POST");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+  });
 });
 
 exports.analyzeEmailContent = functions.https.onRequest(async (req, res) => {
