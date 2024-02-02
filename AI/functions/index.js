@@ -25,7 +25,9 @@ exports.processEmail = functions.https.onRequest(async (req, res) => {
       return res.status(400).json({ error: "email is missing." });
     }
 
-    const prompt = `Analyze the following email content:\n\n"${email}"\n\nIdentify negative sentiments, urgency, and product-related discussions.`;
+    const prompt = `Analyze the following email content:\n\n"${email}"\n\n
+    First give me the following information about the email: sender, title, summary, timestamp, 
+    then Identify negative sentiments, urgency, and product-related discussions.`;
 
     const params = {
       messages: [{ role: "user", content: prompt }],
@@ -50,6 +52,30 @@ exports.processEmail = functions.https.onRequest(async (req, res) => {
     res.set("Access-Control-Allow-Origin", "*");
     res.set("Access-Control-Allow-Methods", "GET, POST");
     res.set("Access-Control-Allow-Headers", "Content-Type");
+  });
+});
+
+// Add a new Cloud Function to fetch and display analyzed emails
+exports.viewProcessedEmails = functions.https.onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    try {
+      const emailsSnapshot = await firestore
+        .collection("processedEmails")
+        .get();
+      const emails = [];
+
+      emailsSnapshot.forEach((doc) => {
+        emails.push(doc.data());
+      });
+
+      res
+        .status(200)
+        .json({ message: "Fetching emails successful", data: emails });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ error: "Internal Server Error", detail: error.message });
+    }
   });
 });
 
