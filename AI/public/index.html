@@ -22,17 +22,37 @@
 
       #brain-image {
         position: absolute;
-        top: 40px; /* Adjust the top position */
-        left: 40px;
+        top: 40px;
+        left: 50px;
         max-width: 120px;
         height: auto;
         max-height: 150px;
       }
 
-      #message {
+      #header {
         text-align: center;
-        margin-bottom: 40px; /* Increase margin-bottom */
+        margin-bottom: 20px; /* Increase margin-bottom */
         font-size: larger;
+      }
+
+      #viewEmailsLink {
+        position: absolute;
+        top: 65px;
+        right: 50px;
+        font-size: 18px;
+        text-decoration: none;
+        transition: all 0.3s;
+        padding: 10px 20px;
+        background-color: #3498db;
+        color: #fff;
+        border-radius: 6px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      #viewEmailsLink:hover {
+        background-color: #2187c5;
+        color: #fff;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
       }
 
       label {
@@ -116,9 +136,12 @@
     <a href="https://targimo.netlify.app/">
       <img src="brain2.png" alt="Brain Image" id="brain-image" />
     </a>
-    <div id="message">
+
+    <div id="header">
       <h2>Welcome to Targimo Email Solutions</h2>
+      <a href="viewEmails.html" id="viewEmailsLink">View Processed Emails</a>
     </div>
+
     <div>
       <label for="inputBox">Enter your email content:</label>
       <input type="text" id="inputBox" />
