@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Targimo Email Solutions - View Emails</title>
+    <link href="brain2.png" rel="icon" />
+    <style>
+      body {
+        font-family: "Roboto", sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background-color: #f4f4f4;
+        position: relative;
+      }
+
+      #brain-image {
+        position: absolute;
+        top: 25px;
+        left: 25px;
+        max-width: 80px;
+        height: auto;
+        max-height: 120px;
+      }
+
+      #emailList {
+        text-align: left;
+        margin: 20px;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 80%;
+        max-width: 600px;
+      }
+
+      #emailList h2 {
+        margin-bottom: 20px;
+        color: #3498db;
+      }
+
+      #sortSelect {
+        margin-bottom: 20px;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #3498db;
+        border-radius: 6px;
+        outline: none;
+        color: #555;
+      }
+
+      #emails {
+        overflow-y: auto;
+        max-height: 400px;
+      }
+
+      .emailCard {
+        margin-bottom: 20px;
+        padding: 20px;
+        border: 1px solid #3498db;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: box-shadow 0.3s;
+        overflow: hidden;
+        background-color: #fff;
+      }
+
+      .emailCard:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      .emailContent {
+        margin-top: 10px;
+        font-size: 16px;
+        display: none;
+      }
+
+      .emailContent.show {
+        display: block;
+      }
+
+      a {
+        margin-top: 20px;
+        color: #3498db;
+        text-decoration: none;
+        font-weight: bold;
+        transition: color 0.3s;
+      }
+
+      a:hover {
+        color: #2187c5;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="https://targimo.netlify.app/">
+      <img src="brain2.png" alt="Brain Image" id="brain-image" />
+    </a>
+
+    <div id="emailList">
+      <h2>Processed Emails</h2>
+      <label for="sortSelect">Sort By:</label>
+      <select id="sortSelect">
+        <option value="default">Default</option>
+        <option value="oldest">Urgent</option>
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+      </select>
+      <div id="emails"></div>
+    </div>
+
+    <a href="index.html">Back to upload email</a>
+
+    <script>
+      async function fetchAndDisplayEmails() {
+        const emailsElement = document.getElementById("emails");
+        const sortSelect = document.getElementById("sortSelect");
+
+        try {
+          const response = await fetch(
+            "https://us-central1-targimo-e39df.cloudfunctions.net/viewProcessedEmails"
+          );
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          const result = await response.json();
+
+          // Display processed email titles as interactive cards
+          const emails = result.data.map((email) => ({
+            date: new Date(email.timestamp),
+            content: email.choices[0].message.content,
+          }));
+
+          // Function to sort emails based on selected criteria
+          const sortEmails = () => {
+            const selectedOption = sortSelect.value;
+            switch (selectedOption) {
+              case "newest":
+                emails.sort((a, b) => b.date - a.date);
+                break;
+              case "oldest":
+                emails.sort((a, b) => a.date - b.date);
+                break;
+              default:
+                // Default sorting, maintain API order
+                break;
+            }
+          };
+
+          // Initial fetch and sort
+          sortEmails();
+
+          // Display processed email titles as interactive cards
+          emails.forEach((email) => {
+            const emailCard = document.createElement("div");
+            emailCard.classList.add("emailCard");
+
+            const emailTitle = document.createElement("div");
+            emailTitle.innerHTML = `<strong>New Email</strong>`;
+            emailCard.appendChild(emailTitle);
+
+            const emailContent = document.createElement("div");
+            emailContent.classList.add("emailContent");
+            emailContent.innerHTML = `<strong>Email:</strong> ${email.content}`;
+            emailCard.appendChild(emailContent);
+
+            // Toggle the display of additional details on card click
+            emailCard.addEventListener("click", () => {
+              emailContent.classList.toggle("show");
+            });
+
+            emailsElement.appendChild(emailCard);
+          });
+
+          // Update emails on sort change
+          sortSelect.addEventListener("change", () => {
+            emailsElement.innerHTML = "";
+            sortEmails();
+            emails.forEach((email) => {
+              const emailCard = document.createElement("div");
+              emailCard.classList.add("emailCard");
+
+              const emailTitle = document.createElement("div");
+              emailTitle.innerHTML = `<strong>New Email:</strong>`;
+              emailCard.appendChild(emailTitle);
+
+              const emailContent = document.createElement("div");
+              emailContent.classList.add("emailContent");
+              emailContent.innerHTML = `<strong>Email:</strong> ${email.content}`;
+              emailCard.appendChild(emailContent);
+
+              // Toggle the display of additional details on card click
+              emailCard.addEventListener("click", () => {
+                emailContent.classList.toggle("show");
+              });
+
+              emailsElement.appendChild(emailCard);
+            });
+          });
+        } catch (error) {
+          console.error("Error:", error.message);
+          emailsElement.innerHTML =
+            "An error occurred while fetching the emails.";
+        }
+      }
+
+      // Fetch and display emails when the page loads
+      window.onload = fetchAndDisplayEmails;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Targimo Email Solutions</title>
+    <link href="brain2.png" rel="icon" />
+
+    <style>
+      body {
+        font-family: "Roboto", sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-color: #f0f0f0;
+        position: relative;
+      }
+
+      #brain-image {
+        position: absolute;
+        top: 40px;
+        left: 50px;
+        max-width: 120px;
+        height: auto;
+        max-height: 150px;
+      }
+
+      #header {
+        text-align: center;
+        margin-bottom: 20px; /* Increase margin-bottom */
+        font-size: larger;
+      }
+
+      #viewEmailsLink {
+        position: absolute;
+        top: 65px;
+        right: 50px;
+        font-size: 18px;
+        text-decoration: none;
+        transition: all 0.3s;
+        padding: 10px 20px;
+        background-color: #3498db;
+        color: #fff;
+        border-radius: 6px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      #viewEmailsLink:hover {
+        background-color: #2187c5;
+        color: #fff;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      label {
+        display: block;
+        margin-bottom: 20px;
+        font-size: 18px;
+      }
+
+      #inputBox {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        font-size: 18px;
+        border: 2px solid #3498db;
+        border-radius: 6px;
+        box-sizing: border-box;
+        outline: none;
+      }
+
+      #output {
+        font-size: 18px;
+        margin-bottom: 10px;
+        color: #333;
+        font-weight: normal;
+        white-space: pre-wrap; /* Preserve line breaks */
+        padding: 15px;
+        background-color: #ecf0f1;
+        border-radius: 8px;
+        text-align: left;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Added box-shadow for a subtle shadow effect */
+      }
+
+      #loading {
+        display: none;
+        text-align: center;
+      }
+
+      .loader {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+        border-top: 4px solid #3498db;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      #load {
+        font-size: 14px;
+        margin-top: 20px;
+      }
+
+      button {
+        background-color: #3498db;
+        color: #fff;
+        padding: 14px 24px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 18px;
+        transition: background-color 0.3s;
+        outline: none;
+        margin-bottom: 20px;
+      }
+
+      button:hover {
+        background-color: #2187c5;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="https://targimo.netlify.app/">
+      <img src="brain2.png" alt="Brain Image" id="brain-image" />
+    </a>
+
+    <div id="header">
+      <h2>Welcome to Targimo Email Solutions</h2>
+      <a href="viewEmails.html" id="viewEmailsLink">View Processed Emails</a>
+    </div>
+
+    <div>
+      <label for="inputBox">Enter your email content:</label>
+      <input type="text" id="inputBox" />
+      <button onclick="showOutput()">Submit</button>
+    </div>
+    <div>
+      <p id="output">Output:</p>
+      <div id="loading">
+        <div
+          style="display: flex; align-items: center; justify-content: center"
+        >
+          <div class="loader"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      async function showOutput() {
+        var inputText = document.getElementById("inputBox").value;
+        var outputElement = document.getElementById("output");
+        var loadingElement = document.getElementById("loading");
+
+        // Show loading indicator
+        loadingElement.style.display = "block";
+
+        try {
+          // Send POST request to Cloud Function
+          const response = await fetch(
+            `https://us-central1-targimo-e39df.cloudfunctions.net/processEmail?email=${inputText}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          const result = await response.json();
+
+          // Example: Displaying the output from Cloud Function
+          outputElement.innerHTML =
+            "<strong>NLP Analysis:</strong><br />" +
+            result.data.choices[0].message.content;
+        } catch (error) {
+          console.error("Error:", error.message);
+          outputElement.innerHTML =
+            "An error occurred while processing the email.";
+        } finally {
+          // Hide loading indicator once processing is done
+          loadingElement.style.display = "none";
+        }
+      }
+    </script>
+  </body>
+</html>
